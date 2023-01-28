@@ -1,0 +1,68 @@
+It'll be great if I make ecs variable invisible
+SharedPtrs
+
+Entity:
+    e = new Entity();
+    e.AddComponent(c);
+    e.RemoveComponent<HealthComponent>() || e.RemoveComponent(HealthComponentType)
+    e.HasComponent<HealthComponent>() || e.HasComponent(HealthComponentType)
+    e.destroy();
+
+    Entity SomeEntityFactory()
+
+    // e.destroy() must check if e has DestructionEventComponent and if
+    // yes, fire destruction event
+    e.AddComponent(new DestructionEventComponent())
+    e.GetComponent<DestructionEventComponent>().AddListener([](){});
+
+Component:
+    Component health_component = new HealthComponent();
+    entity.RemoveComponent<HealthComponent>(); // error
+    entity.AddComponent(health_component);
+    entity.AddComponent(new HealthComponent); // error
+
+System:
+    class System {
+        const unordered_set<Entity>& GetConsideredEntities();
+    }
+
+    class DamageSystem : System {
+        bool ShouldBeConsidered(Entity e) {
+            return e.HasComponent<HealthComponent>() && e.HasComponent<ColliderComponent>
+        }
+
+        void OnUpdate(Time delta) {...}
+    }
+
+    // ?????
+        class DamageSystem : System<HealthComponent, ColliderComponent> {
+            void OnUpdate(Time delta) {...}
+        }
+        class DamageSystem : System<and<HealthComponent, ColliderComponent>> {
+            void OnUpdate(Time delta) {...}
+        }
+ECS:
+    There must be some global ECS variable
+
+Use case:
+    1) user defines some components and systems
+        class HealthComponent : ECS::Component {
+            int health; (get/set)
+        }
+        class ColliderComponent : ECS::Component {
+            bool CollidesWith(ColliderComponent);
+        }
+
+        class DamageSystem : ECS::System {
+            bool ShouldBeConsidered(Entity e) {
+                return e.HasComponent<HealthComponent>();
+            }
+
+            void OnUpdate(Time delta) {
+                GetConsideredEntities().for_each([](const Entity& e) {
+                    e.GetHealthComponent
+                })
+            }
+        }
+
+        ECS::AddSystem(new DamageSystem());
